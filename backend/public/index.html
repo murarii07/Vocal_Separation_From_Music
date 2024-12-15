@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="ff()">
+        <input type="file" name="music">
+        <button type="submit">ok</button>
+    </form>
+    <p></p>
+    <script >
+        async function ff(e){
+            e.preventDefault();
+            let data=new FormData(e.target);
+            let r=fetch("/upload",{method:"POST",body:data})
+            .then((data)=>{
+                return data;
+            })
+            .catch((error)=>{
+                return error
+            })
+            if(r.message==="succeeded"){
+                document.querySelector("p").innerText=r.message
+            }
+            else{
+                document.querySelector("p").innerText="try again later"
+            
+            }
+        }
+    </script>
+</body>
+</html>
