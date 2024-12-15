@@ -6,7 +6,6 @@ import { RequestHandler } from 'express-serve-static-core';
 import cookieParser from 'cookie-parser';
 import { userIdGenerator } from './listId.js';
 import { listId } from './listId.js';
-import { error } from 'console';
 const app = express();
 app.use(express.static("./public"))
 app.use(express.json())
