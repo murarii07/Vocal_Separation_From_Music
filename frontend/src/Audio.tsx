@@ -12,6 +12,7 @@ import { AlertMessage } from './AlertMessage'
 import { IoMdPlayCircle } from "react-icons/io";
 import { FaDownload } from "react-icons/fa";
 import { CiPause1 } from "react-icons/ci";
+
 export const AudioCard = () => {
   const dispatch = useDispatch()
   const audioPlay = useSelector((s: RootState) => s.audioPlay)
@@ -26,6 +27,7 @@ export const AudioCard = () => {
   const [error, setError] = useState({ flag: false, message: "error" })
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const src = toggle ? vocalSrc : uploadedAudio;
+  
   useEffect(() => {
     const updateCount = () => {
       setCount(parseInt(audioRef.current!.currentTime.toFixed(0)))
@@ -35,9 +37,7 @@ export const AudioCard = () => {
     };
     audioRef.current?.addEventListener("timeupdate", updateCount);
     return () => audioRef.current!.removeEventListener("timeupdate", updateCount);
-  }
-    , [count])
-
+  }, [count])
 
   useEffect(() => {
     dispatch(currentPositionUpdate(audioRef.current!.currentTime))
@@ -53,6 +53,7 @@ export const AudioCard = () => {
     audioRef.current!.play();
     console.log("current time", currentTime)
   }
+  
   function playAudioLogic(): void {
     console.log("hru")
     audioRef.current!.pause();
@@ -69,6 +70,7 @@ export const AudioCard = () => {
       pauseAudioLogic()
     }
   };
+  
   const handleDownload = () => {
     fetch("http://localhost:3000/download", {
       credentials: "include"
@@ -89,47 +91,122 @@ export const AudioCard = () => {
   }
 
   return (
-    <div className='box  w-56 h-full flex flex-col gap-2 justify-center box-border'>
-
-      <div className="box  w-full h-5/6 flex flex-col gap-2 box-border rounded-lg bg-neutral-900 shadow-lg shadow-black">
-        <div className='w-[95%] h-[60%] mx-auto mt-2'> <div className='w-[75%] h-[90%] bg-white mx-auto rounded-lg overflow-hidden '> <img src="assets/d.jpg" alt="" className='w-full h-full rounded-lg' /></div></div>
-        <Progress value={count / durInSec * 100} className='w-11/12 mx-auto bg-white' />
-
-        <div className='
-   mx-auto w-11/12 flex justify-between'><div>{count > 60 ? (count / 60).toFixed(0) : 0}:{count % 60}</div> <div>{dur.min}:{dur.sec}</div></div>
-        <div className='w-full h-1/5'>
-          <div className='w-full flex justify-center items-center h-full gap-x-3 cursor-pointer flex-wrap'>
-
-            <Button className=' rounded-full w-1/6 h-5/6 shadow-md  flex items-center justify-center  mb-[4px]  '
-              onClick={controlAudio} >
-              {!play ? <IoMdPlayCircle style={{ maxWidth: "150px", width: "150px", height: "100%" }} />
-                :
-                <CiPause1 style={{ maxWidth: "150px", width: "150px", height: "100%" }} />}
+    <div className='w-full max-w-md mx-auto'>
+      {/* Main Audio Player Card */}
+      <div className="bg-gradient-to-br from-neutral-900/80 to-neutral-800/60 backdrop-blur-xl border border-neutral-700/50 rounded-3xl p-6 shadow-2xl">
+        
+        {/* Album Art Section */}
+        <div className='relative mb-6 group'>
+          <div className='aspect-square w-full bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-2xl overflow-hidden shadow-lg'>
+            <img 
+              src="assets/d.jpg" 
+              alt="Album Art" 
+              className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500' 
+            />
+            {/* Overlay gradient for better text visibility */}
+            <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent'></div>
+          </div>
+          
+          {/* Floating play button overlay */}
+          <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+            <Button 
+              onClick={controlAudio}
+              className='w-16 h-16 rounded-full bg-white/90 hover:bg-white text-black shadow-xl hover:scale-110 transition-all duration-300 backdrop-blur-sm'
+            >
+              {!play ? 
+                <IoMdPlayCircle className="w-8 h-8" /> 
+                : 
+                <CiPause1 className="w-8 h-8" />
+              }
             </Button>
-
-
           </div>
-
         </div>
-      </div>{vocalSrc ?
-        <>
-          <div className='w-full bg-neutral-900 rounded-md p-2 flex gap-5 items-center justify-center flex-wrap'>   <Label htmlFor='vocal'>Vocal</Label>
-            <Switch onCheckedChange={() => {
 
-              setToggle(!toggle)
+        {/* Track Info */}
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-semibold text-white mb-1">Processed Audio</h3>
+          <p className="text-neutral-400 text-sm">
+            {toggle ? 'Vocal Track' : 'Original Audio'}
+          </p>
+        </div>
 
-
-            }} defaultChecked></Switch>
-            <span onClick={handleDownload} className='cursor-pointer'><FaDownload /></span>
+        {/* Progress Bar */}
+        <div className="space-y-3 mb-6">
+          <Progress 
+            value={count / durInSec * 100} 
+            className='w-full h-2 bg-neutral-700 rounded-full overflow-hidden'
+          />
+          
+          {/* Time Display */}
+          <div className='flex justify-between text-sm text-neutral-400 font-mono'>
+            <span>{Math.floor(count / 60)}:{(count % 60).toString().padStart(2, '0')}</span>
+            <span>{dur.min}:{dur.sec.toString().padStart(2, '0')}</span>
           </div>
+        </div>
 
+        {/* Control Section */}
+        <div className='flex items-center justify-center mb-6'>
+          <Button 
+            onClick={controlAudio}
+            className='w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105'
+          >
+            {!play ? 
+              <IoMdPlayCircle className="w-7 h-7 text-white" /> 
+              : 
+              <CiPause1 className="w-7 h-7 text-white" />
+            }
+          </Button>
+        </div>
+      </div>
 
-          <audio ref={audioRef} src={src} controls={false} hidden />
+      {/* Controls Panel */}
+      {vocalSrc && (
+        <div className='mt-4 bg-gradient-to-r from-neutral-900/60 to-neutral-800/40 backdrop-blur-sm border border-neutral-700/50 rounded-2xl p-4'>
+          <div className='flex items-center justify-between'>
+            
+            {/* Audio Source Toggle */}
+            <div className='flex items-center gap-3'>
+              <Label htmlFor='vocal' className="text-sm font-medium text-neutral-300">
+                {toggle ? 'Vocals' : 'Original'}
+              </Label>
+              <Switch 
+                onCheckedChange={() => setToggle(!toggle)} 
+                defaultChecked 
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-purple-600"
+              />
+            </div>
 
-        </>
-        : ""}
-      <AlertMessage alertt={error} alertChange={setError} description={error.message} />
+            {/* Download Button */}
+            <Button
+              onClick={handleDownload}
+              variant="ghost"
+              size="sm"
+              className='text-neutral-400 hover:text-white hover:bg-neutral-700/50 rounded-xl transition-all duration-300 group'
+            >
+              <FaDownload className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+            </Button>
+          </div>
+          
+          {/* Track Type Indicator */}
+          <div className="mt-3 flex justify-center">
+            <div className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
+              toggle 
+                ? 'bg-gradient-to-r from-blue-500/20 to-purple-600/20 text-blue-300 border border-blue-500/30' 
+                : 'bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-300 border border-orange-500/30'
+            }`}>
+              {toggle ? '🎤 Vocal Track' : '🎵 Original Audio'}
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* Hidden Audio Element */}
+      <audio ref={audioRef} src={src} controls={false} hidden />
+      
+      {/* Alert Message */}
+      <div className="mt-4">
+        <AlertMessage alertt={error} alertChange={setError} description={error.message} />
+      </div>
     </div>
   )
 }
