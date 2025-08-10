@@ -37,7 +37,7 @@ export function InputFile() {
 
   async function fetc() {
     if (!file.size) {
-      setAlertt({ ...alertt, flag: true, message: "please upload a file" })
+      setAlertt({...alertt,flag:true,message:"please upload a file"})
       return
     }
     setLoading(true)
@@ -53,8 +53,8 @@ export function InputFile() {
           }
         })
       console.log(data.error)
-      if (data.error) {
-        setError({ flag: true, message: data.error })
+      if(data.error){
+        setError({flag:true,message:data.error})
         setLoading(false)
         return;
       }
@@ -63,7 +63,7 @@ export function InputFile() {
         throw new Error("ReadableStream is not supported.");
       }
       const s = datas.body.getReader()
-      const chunks: Uint8Array<ArrayBuffer>[] = [];
+      const chunks: Uint8Array[] = [];
       while (1) {
         const { done, value } = await s.read()
         if (done) break;
@@ -78,11 +78,13 @@ export function InputFile() {
       const ss = new Audio(URL.createObjectURL(audioBlob))
       console.log(ss)
 
+
     } catch (error: any) {
       console.log(error)
-      setError({ flag: true, message: error.message })
+      setError({flag:true,message:error.message})
       setLoading(false)
     }
+
   }
 
   return (
